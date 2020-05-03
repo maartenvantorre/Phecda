@@ -1,0 +1,72 @@
+### Een python3 script ###
+
+import pyfits
+import matplotlib.pyplot as plt
+from matplotlib.collections import PatchCollection
+import matplotlib
+from matplotlib import rc
+from matplotlib.colors import LogNorm 
+from scipy.optimize import leastsq
+
+import numpy as np
+from scipy.ndimage.filters import minimum_filter
+from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
+from scipy.ndimage.measurements import minimum_position
+
+imag = pyfits.open( "Phecdakopie.fit" )
+header, phecda = imag[0].header, imag[0].data
+
+lambda1 = header["CRVAL1"]
+dlambda = header["CDELT1"]
+npix    = header["NAXIS1"]
+lambdaN = lambda1 + (npix-1)*dlambda
+
+waves = np.linspace( lambda1, lambdaN, npix )
+zetas = ( waves-6563 )/6563
+dzeta = dlambda/6563
+
+imag1 = pyfits.open( "siriusverschoven.fit" )
+header, sirius = imag1[0].header, imag1[0].data
+# verschuif siriusspectrum met in dit geval 4 pixels zodat diepste
+# punt van lijnen overlapt
+sirius = np.roll( sirius, 11 )
+
+c = 299792.458
+# beta0 is initiele gok voor rotatiesnelheid, in dit geval 180 km/s
+beta0 = 180./c
+
+fac0 = 2./np.pi
+fac1 = 1/8./np.pi
+fac2 = 3*np.pi
+def kernel( x ):
+#    return fac0*np.sqrt( 1-x*x )
+    y = 1-x*x
+    return fac1*( 8*np.sqrt( y ) + fac2*y )
+
+def convolve( beta, ster ):
+    tmp = np.zeros( npix )
+    shift = int( beta/dzeta )
+# doe convolutie tussen pixels 1700 en 1800, in dit geval
+    for i in range( 1700 , 1800):
+        for j in range( -shift, shift,1 ):
+            tmp[i] += ster[i+j]*kernel( j*dzeta/beta )
+    return tmp*dzeta/beta
+
+def lsq( beta_row, ster ):
+    beta = beta_row[0]
+    shift = int( beta/dzeta )
+    conv = [ ]
+# doe convolutie tussen pixels 1700 en 1800 in dit geval
+    for i in range( 1700 , 1800):
+        tmp = 0.0  # 1 pixel van geconvolueerd siriusspectrum
+        for j in range( -shift, shift,1 ):
+            tmp += ster[i+j]*kernel( j*dzeta/beta )*dzeta/beta
+        conv.append( ( tmp-phecda[i] )/phecda[i] )
+    conv = np.array( conv )
+    
+    return conv
+
+snelheid = leastsq( lsq, [ beta0 ], args=( sirius, ) )[0][0]
+
+# corrigeer voor de rotatiesnelheid van Sirius, nl. 17 km/s
+print(snelheid*c, np.sqrt( ( snelheid*c )**2+17.0**2 ))
