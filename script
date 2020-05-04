@@ -25,7 +25,7 @@ dzeta = dlambda/6563
 
 imag1 = pyfits.open( "siriusverschoven.fit" )
 header, sirius = imag1[0].header, imag1[0].data
-# verschuif siriusspectrum met in dit geval 4 pixels zodat diepste
+# verschuif siriusspectrum met in dit geval 11 pixels zodat diepste
 # punt van lijnen overlapt
 sirius = np.roll( sirius, 11 )
 
