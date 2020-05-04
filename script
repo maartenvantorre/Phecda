@@ -50,6 +50,8 @@ def convolve( beta, ster ):
             tmp[i] += ster[i+j]*kernel( j*dzeta/beta )
     return tmp*dzeta/beta
 
+#nog een multiplicatieve factor invoeren,zodat je de beste fit vindt tussen beide spectra 
+factor = 2
 def lsq( beta_row, ster ):
     beta = beta_row[0]
     shift = int( beta/dzeta )
@@ -58,13 +60,13 @@ def lsq( beta_row, ster ):
     for i in range( 1000 , 2300):
         tmp = 0.0  # 1 pixel van geconvolueerd siriusspectrum
         for j in range( -shift, shift,1 ):
-            tmp += ster[i+j]*kernel( j*dzeta/beta )*dzeta/beta
+            tmp += ster[i+j]*factor*kernel( j*dzeta/beta )*dzeta/beta
         conv.append( ( tmp-phecda[i] )/phecda[i] )
     conv = np.array( conv )
     
     return conv
 
-snelheid = leastsq( lsq, [ beta0 ], args=( sirius, ) )[0][0]
+snelheid = leastsq( lsq, [ beta0, factor ], args=( sirius, ) )[0][0]
 
 # corrigeer voor de rotatiesnelheid van Sirius, nl. 17 km/s
 print(snelheid*c, np.sqrt( ( snelheid*c )**2+17.0**2 ))
@@ -81,4 +83,4 @@ ax.plot( zetas, broadened, 'g-' )
 ax.set_xlim( -0.005, 0.005 )
 ax.set_ylim( 0,1 )
 
-plt.show()
+plt.show()​
