@@ -25,7 +25,7 @@ dzeta = dlambda/6563
 
 imag1 = pyfits.open( "siriusverschoven.fit" )
 header, sirius = imag1[0].header, imag1[0].data
-# verschuif siriusspectrum met in dit geval 11 pixels zodat diepste
+# verschuif siriusspectrum met in dit geval 4 pixels zodat diepste
 # punt van lijnen overlapt
 sirius = np.roll( sirius, 11 )
 
@@ -44,8 +44,8 @@ def kernel( x ):
 def convolve( beta, ster ):
     tmp = np.zeros( npix )
     shift = int( beta/dzeta )
-# doe convolutie tussen pixels 1000 en 2500, in dit geval
-    for i in range( 1000 , 2500):
+# doe convolutie tussen pixels 1200 en 2500, in dit geval
+    for i in range( 1200 , 2500):
         for j in range( -shift, shift,1 ):
             tmp[i] += ster[i+j]*kernel( j*dzeta/beta )
     return tmp*dzeta/beta
@@ -54,8 +54,8 @@ def lsq( beta_row, ster ):
     beta = beta_row[0]
     shift = int( beta/dzeta )
     conv = [ ]
-# doe convolutie tussen pixels 1000 en 2500 in dit geval
-    for i in range( 1000 , 2500):
+# doe convolutie tussen pixels 1200 en 2500 in dit geval
+    for i in range( 1200 , 2500):
         tmp = 0.0  # 1 pixel van geconvolueerd siriusspectrum
         for j in range( -shift, shift,1 ):
             tmp += ster[i+j]*kernel( j*dzeta/beta )*dzeta/beta
@@ -81,4 +81,4 @@ ax.plot( zetas, broadened, 'g-' )
 ax.set_xlim( -0.005, 0.005 )
 ax.set_ylim( 0,1 )
 
-plt.show( )
+plt.show()
