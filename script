@@ -44,8 +44,8 @@ def kernel( x ):
 def convolve( beta, ster ):
     tmp = np.zeros( npix )
     shift = int( beta/dzeta )
-# doe convolutie tussen pixels 1200 en 2500, in dit geval
-    for i in range( 1200 , 2500):
+# doe convolutie tussen pixels 1000 en 2300, in dit geval
+    for i in range( 1000 , 2300):
         for j in range( -shift, shift,1 ):
             tmp[i] += ster[i+j]*kernel( j*dzeta/beta )
     return tmp*dzeta/beta
@@ -54,8 +54,8 @@ def lsq( beta_row, ster ):
     beta = beta_row[0]
     shift = int( beta/dzeta )
     conv = [ ]
-# doe convolutie tussen pixels 1200 en 2500 in dit geval
-    for i in range( 1200 , 2500):
+# doe convolutie tussen pixels 1000 en 2300 in dit geval
+    for i in range( 1000 , 2300):
         tmp = 0.0  # 1 pixel van geconvolueerd siriusspectrum
         for j in range( -shift, shift,1 ):
             tmp += ster[i+j]*kernel( j*dzeta/beta )*dzeta/beta
