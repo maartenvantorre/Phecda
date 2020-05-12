@@ -69,7 +69,8 @@ def lsq( beta_row, ster ):
 snelheid = leastsq( lsq, [ beta0, factor ], args=( sirius, ) )[0][0]
 
 # corrigeer voor de rotatiesnelheid van Sirius, nl. 17 km/s
-print(snelheid*c, np.sqrt( ( snelheid*c )**2+17.0**2 ))
+snelheid_eff = np.sqrt( ( snelheid*c )**2+17.0**2
+print(snelheid*c, snelheid_eff ))
 
 broadened = convolve( snelheid, sirius )
 
@@ -83,4 +84,4 @@ ax.plot( zetas, broadened, 'g-' )
 ax.set_xlim( -0.005, 0.005 )
 ax.set_ylim( 0,1 )
 
-plt.show()​
+plt.show()
