@@ -28,9 +28,6 @@ dzeta = dlambda/6563
 
 imag = pyfits.open( "siriusverschoven.fit" )
 header, sirius = imag[0].header, imag[0].data
-# verschuif siriusspectrum met in dit geval 4 pixels zodat diepste
-# punt van lijnen overlapt
-sirius = np.roll( sirius, 11)
 
 c = 299792.458
 # beta0 is initiele gok voor rotatiesnelheid, in dit geval 180 km/s
