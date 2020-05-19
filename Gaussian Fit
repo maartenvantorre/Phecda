@@ -27,7 +27,8 @@ def Gauss(x, y0, a, x0, sigma):
 
 
 popt,pcov = curve_fit(Gauss, x, y, p0=[1, max(y), mean, sigma])
-print(sigma)
+Fout_orde = 2.355*sigma/20
+print(Fout_orde)
 plt.plot(x, y, 'b+:', label='data')
 plt.plot(x, Gauss(x, *popt), 'r-', label='fit')
 
