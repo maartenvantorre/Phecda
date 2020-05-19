@@ -1,9 +1,34 @@
-from scipy import optimize
+# dit is een gaussische fit is van de west-kant 
+# het is analoog voor de oostkant
 
-def gaussian(x, amplitude, mean, stddev):
-    return amplitude * np.exp(-0.5*((x - mean) / stddev)**2)
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+import numpy as np
+import pyfits
 
-popt, _ = optimize.curve_fit(gaussian, x, data)
+west = pyfits.open('west.fit')
+east = pyfits.open('east.fit')
 
-plt.plot(x, data)
-plt.plot(x, gaussian(x, *popt))
+stap = west[0].header[6]
+lambda0 = west[0].header[7] #startgolflengte
+
+#note: de pixelwaardes zo kiezen dat de absorptielijn ertussen ligt (anders voor de oostkant)
+a,b = 1646,1742
+y= west[0].data[a:b]
+x = np.arange(start=lambda0 + a*stap,stop=lambda0 + b*stap,step=stap)
+
+
+# weighted arithmetic mean (corrected - check the section below)
+mean = sum(x * y) / sum(y)
+sigma = np.sqrt(sum(y * (x - mean)**2) / sum(y))
+
+def Gauss(x, y0, a, x0, sigma):
+    return y0 + a * np.exp(-(x - x0)**2 / (2 * sigma**2))
+
+
+popt,pcov = curve_fit(Gauss, x, y, p0=[1, max(y), mean, sigma])
+print(sigma)
+plt.plot(x, y, 'b+:', label='data')
+plt.plot(x, Gauss(x, *popt), 'r-', label='fit')
+
+plt.show()
