@@ -17,18 +17,19 @@ a,b = 1646,1742
 y= west[0].data[a:b]
 x = np.arange(start=lambda0 + a*stap,stop=lambda0 + b*stap,step=stap)
 
-
-# weighted arithmetic mean (corrected - check the section below)
+#Functie opstellen
 mean = sum(x * y) / sum(y)
 sigma = np.sqrt(sum(y * (x - mean)**2) / sum(y))
 
 def Gauss(x, y0, a, x0, sigma):
     return y0 + a * np.exp(-(x - x0)**2 / (2 * sigma**2))
 
-
+#Fitten
 popt,pcov = curve_fit(Gauss, x, y, p0=[1, max(y), mean, sigma])
 Fout_orde = 2.355*sigma/20
 print(Fout_orde)
+
+#plotten
 plt.plot(x, y, 'b+:', label='data')
 plt.plot(x, Gauss(x, *popt), 'r-', label='fit')
 
