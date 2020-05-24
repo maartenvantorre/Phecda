@@ -13,7 +13,7 @@ from scipy.ndimage.filters import minimum_filter
 from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
 from scipy.ndimage.measurements import minimum_position
 
-imag = pyfits.open( "Phecdakopie.fit" )
+imag = pyfits.open( "Phecdakopie.fit" )                 #openen van de data van Phecda
 header, phecda = imag[0].header, imag[0].data
 
 lambda1 = header["CRVAL1"]
@@ -26,7 +26,7 @@ waves = np.linspace( lambda1, lambdaN, npix )
 zetas = ( waves-6563 )/6563
 dzeta = dlambda/6563
 
-imag = pyfits.open( "siriusverschoven.fit" )
+imag = pyfits.open( "siriusverschoven.fit" )            #openen van de data van Sirius
 header, sirius = imag[0].header, imag[0].data
 
 c = 299792.458
@@ -64,6 +64,9 @@ def lsq( beta_row, ster ):
     print beta*c, np.sum( conv**2 )
     return conv
 
+#variëren, met een leastsq, van de rotatiesnelheid totdat het verbreedde Siriusspectrum 
+#zo goed mogelijk past aan het waargenomen spectrum van Phecda.
+
 oplossing = leastsq( lsq, [ beta0, 1.0 ], args=( sirius, ) )[0]
 snelheid = oplossing[0]
 factor = oplossing[1]
@@ -71,6 +74,7 @@ factor = oplossing[1]
 # corrigeer voor de rotatiesnelheid van Sirius, nl. 17 km/s
 print snelheid*c, np.sqrt( ( snelheid*c )**2+17.0**2 )
 
+#convolutie uitvoeren
 broadened = convolve( snelheid, factor, sirius )
 
 fig = plt.figure( )
