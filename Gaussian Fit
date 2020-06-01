@@ -1,4 +1,4 @@
-# dit is een gaussische fit is van de west-kant 
+# dit is een gaussische fit van de west-kant 
 # het is analoog voor de oostkant
 
 import matplotlib.pyplot as plt
@@ -6,6 +6,7 @@ from scipy.optimize import curve_fit
 import numpy as np
 import pyfits
 
+#openen van de fit bestanden
 west = pyfits.open('west.fit')
 east = pyfits.open('east.fit')
 
